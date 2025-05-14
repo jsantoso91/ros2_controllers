@@ -283,7 +283,7 @@ TEST_F(
   EXPECT_EQ(cmd_if_conf.type, controller_interface::interface_configuration_type::INDIVIDUAL);
 }
 
-TEST_F(TestDiffDriveController, configure_succeededs_tf_test_prefix_false_no_namespace)
+TEST_F(TestDiffDriveController, configure_succeeds_tf_test_prefix_false_no_namespace)
 {
   std::string odom_id = "odom";
   std::string base_link_id = "base_link";
@@ -308,7 +308,7 @@ TEST_F(TestDiffDriveController, configure_succeededs_tf_test_prefix_false_no_nam
   ASSERT_EQ(test_base_frame_id, base_link_id);
 }
 
-TEST_F(TestDiffDriveController, configure_succeededs_tf_test_prefix_true_no_namespace)
+TEST_F(TestDiffDriveController, configure_succeeds_tf_test_prefix_true_no_namespace)
 {
   std::string odom_id = "odom";
   std::string base_link_id = "base_link";
@@ -335,7 +335,7 @@ TEST_F(TestDiffDriveController, configure_succeededs_tf_test_prefix_true_no_name
   ASSERT_EQ(test_base_frame_id, frame_prefix + "/" + base_link_id);
 }
 
-TEST_F(TestDiffDriveController, configure_succeededs_tf_blank_prefix_true_no_namespace)
+TEST_F(TestDiffDriveController, configure_succeeds_tf_blank_prefix_true_no_namespace)
 {
   std::string odom_id = "odom";
   std::string base_link_id = "base_link";
@@ -361,7 +361,7 @@ TEST_F(TestDiffDriveController, configure_succeededs_tf_blank_prefix_true_no_nam
   ASSERT_EQ(test_base_frame_id, base_link_id);
 }
 
-TEST_F(TestDiffDriveController, configure_succeededs_tf_test_prefix_false_set_namespace)
+TEST_F(TestDiffDriveController, configure_succeeds_tf_test_prefix_false_set_namespace)
 {
   std::string test_namespace = "/test_namespace";
 
@@ -389,7 +389,7 @@ TEST_F(TestDiffDriveController, configure_succeededs_tf_test_prefix_false_set_na
   ASSERT_EQ(test_base_frame_id, base_link_id);
 }
 
-TEST_F(TestDiffDriveController, configure_succeededs_tf_test_prefix_true_set_namespace)
+TEST_F(TestDiffDriveController, configure_succeeds_tf_test_prefix_true_set_namespace)
 {
   std::string test_namespace = "/test_namespace";
 
@@ -419,7 +419,7 @@ TEST_F(TestDiffDriveController, configure_succeededs_tf_test_prefix_true_set_nam
   ASSERT_EQ(test_base_frame_id, frame_prefix + "/" + base_link_id);
 }
 
-TEST_F(TestDiffDriveController, configure_succeededs_tf_blank_prefix_true_set_namespace)
+TEST_F(TestDiffDriveController, configure_succeeds_tf_blank_prefix_true_set_namespace)
 {
   std::string test_namespace = "/test_namespace";
   std::string odom_id = "odom";
@@ -457,7 +457,7 @@ TEST_F(TestDiffDriveController, activate_fails_without_resources_assigned)
   expect_activate_succeeded(controller_, false);
 }
 
-TEST_F(TestDiffDriveController, activate_succeededs_with_pos_resources_assigned)
+TEST_F(TestDiffDriveController, activate_succeeds_with_pos_resources_assigned)
 {
   ASSERT_EQ(InitController(), controller_interface::return_type::OK);
 
@@ -469,7 +469,7 @@ TEST_F(TestDiffDriveController, activate_succeededs_with_pos_resources_assigned)
   expect_activate_succeeded(controller_, true);
 }
 
-TEST_F(TestDiffDriveController, activate_succeededs_with_vel_resources_assigned)
+TEST_F(TestDiffDriveController, activate_succeeds_with_vel_resources_assigned)
 {
   ASSERT_EQ(
     InitController(
