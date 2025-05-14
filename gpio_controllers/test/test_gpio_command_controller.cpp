@@ -127,6 +127,7 @@ public:
     setup_command_and_state_interfaces();
 
     expect_activate_succeeded(controller_, true);
+
   }
 
   void stop_test_when_message_cannot_be_published(int max_sub_check_loop_count)
