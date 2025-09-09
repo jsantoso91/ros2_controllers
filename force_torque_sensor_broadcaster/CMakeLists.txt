@@ -7,6 +7,7 @@ export_windows_symbols()
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   controller_interface
+  filters
   generate_parameter_library
   geometry_msgs
   hardware_interface
@@ -35,9 +36,15 @@ target_include_directories(force_torque_sensor_broadcaster PUBLIC
   $<INSTALL_INTERFACE:include/force_torque_sensor_broadcaster>
 )
 target_link_libraries(force_torque_sensor_broadcaster PUBLIC
-  force_torque_sensor_broadcaster_parameters
-)
-ament_target_dependencies(force_torque_sensor_broadcaster PUBLIC ${THIS_PACKAGE_INCLUDE_DEPENDS})
+                      force_torque_sensor_broadcaster_parameters
+                      controller_interface::controller_interface
+                      filters::filter_chain
+                      hardware_interface::hardware_interface
+                      pluginlib::pluginlib
+                      rclcpp::rclcpp
+                      rclcpp_lifecycle::rclcpp_lifecycle
+                      realtime_tools::realtime_tools
+                      ${geometry_msgs_TARGETS})
 
 pluginlib_export_plugin_description_file(
   controller_interface force_torque_sensor_broadcaster.xml)
@@ -53,11 +60,9 @@ if(BUILD_TESTING)
   target_include_directories(test_load_force_torque_sensor_broadcaster PRIVATE include)
   target_link_libraries(test_load_force_torque_sensor_broadcaster
     force_torque_sensor_broadcaster
-  )
-  ament_target_dependencies(test_load_force_torque_sensor_broadcaster
-    controller_manager
-    hardware_interface
-    ros2_control_test_assets
+    controller_manager::controller_manager
+    hardware_interface::hardware_interface
+    ros2_control_test_assets::ros2_control_test_assets
   )
 
   add_rostest_with_parameters_gmock(test_force_torque_sensor_broadcaster
@@ -67,9 +72,31 @@ if(BUILD_TESTING)
   target_link_libraries(test_force_torque_sensor_broadcaster
     force_torque_sensor_broadcaster
   )
-  ament_target_dependencies(test_force_torque_sensor_broadcaster
-    hardware_interface
+
+  add_library(dummy_filter SHARED
+    test/dummy_filter.cpp
   )
+  target_compile_features(dummy_filter PUBLIC cxx_std_17)
+  target_include_directories(dummy_filter PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+      $<INSTALL_INTERFACE:include/force_torque_sensor_broadcaster>
+  )
+  target_link_libraries(dummy_filter PUBLIC
+    filters::increment
+    ${geometry_msgs_TARGETS}
+    pluginlib::pluginlib
+    rclcpp::rclcpp
+  )
+  install(
+    TARGETS
+      dummy_filter
+    EXPORT export_force_torque_sensor_broadcaster
+    RUNTIME DESTINATION bin
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+  )
+
+  pluginlib_export_plugin_description_file(filters "test/dummy_filter_plugin.xml")
 endif()
 
 install(
