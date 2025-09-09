@@ -76,13 +76,6 @@ public:
 
   void TearDown() { gps_broadcaster_.reset(nullptr); }
 
-  void SetUp()
-  {
-    gps_broadcaster_ = std::make_unique<gps_sensor_broadcaster::GPSSensorBroadcaster>();
-  }
-
-  void TearDown() { gps_broadcaster_.reset(nullptr); }
-
   template <
     semantic_components::GPSSensorOption sensor_option =
       semantic_components::GPSSensorOption::WithoutCovariance>
@@ -119,25 +112,32 @@ public:
     return gps_msg;
   }
 
-  void expect_configure_succeeded(
-    std::unique_ptr<gps_sensor_broadcaster::GPSSensorBroadcaster> & broadcaster, bool succeeded)
+  bool is_configure_succeeded(
+    const std::unique_ptr<gps_sensor_broadcaster::GPSSensorBroadcaster> & broadcaster)
   {
     auto state = broadcaster->configure();
-
-    if (succeeded)
-      ASSERT_EQ(State::PRIMARY_STATE_INACTIVE, state.id());
-    else
-      ASSERT_EQ(State::PRIMARY_STATE_UNCONFIGURED, state.id());
+    return State::PRIMARY_STATE_INACTIVE == state.id();
   }
 
-  void expect_activate_succeeded(
-    std::unique_ptr<gps_sensor_broadcaster::GPSSensorBroadcaster> & broadcaster, bool succeeded)
+  bool is_configure_failed(
+    const std::unique_ptr<gps_sensor_broadcaster::GPSSensorBroadcaster> & broadcaster)
+  {
+    auto state = broadcaster->configure();
+    return State::PRIMARY_STATE_UNCONFIGURED == state.id();
+  }
+
+  bool is_activate_succeeded(
+    const std::unique_ptr<gps_sensor_broadcaster::GPSSensorBroadcaster> & broadcaster)
   {
     auto state = broadcaster->get_node()->activate();
-    if (succeeded)
-      ASSERT_EQ(State::PRIMARY_STATE_ACTIVE, state.id());
-    else
-      ASSERT_EQ(State::PRIMARY_STATE_UNCONFIGURED, state.id());
+    return State::PRIMARY_STATE_ACTIVE == state.id();
+  }
+
+  bool is_activate_failed(
+    const std::unique_ptr<gps_sensor_broadcaster::GPSSensorBroadcaster> & broadcaster)
+  {
+    auto state = broadcaster->get_node()->activate();
+    return State::PRIMARY_STATE_UNCONFIGURED == state.id();
   }
 
 protected:
@@ -188,9 +188,9 @@ TEST_F(
     node_options);
   ASSERT_EQ(result, controller_interface::return_type::OK);
 
-  expect_configure_succeeded(gps_broadcaster_, true);
+  ASSERT_TRUE(is_configure_succeeded(gps_broadcaster_));
 
-  expect_activate_succeeded(gps_broadcaster_, true);
+  ASSERT_TRUE(is_activate_succeeded(gps_broadcaster_));
 }
 
 TEST_F(
@@ -203,11 +203,11 @@ TEST_F(
     node_options);
   ASSERT_EQ(result, controller_interface::return_type::OK);
 
-  expect_configure_succeeded(gps_broadcaster_, true);
+  ASSERT_TRUE(is_configure_succeeded(gps_broadcaster_));
 
   setup_gps_broadcaster();
 
-  expect_activate_succeeded(gps_broadcaster_, true);
+  ASSERT_TRUE(is_activate_succeeded(gps_broadcaster_));
 
   const auto gps_msg = subscribe_and_get_message();
   EXPECT_EQ(gps_msg.header.frame_id, frame_id_.get_value<std::string>());
@@ -236,11 +236,11 @@ TEST_F(
     node_options);
   ASSERT_EQ(result, controller_interface::return_type::OK);
 
-  expect_configure_succeeded(gps_broadcaster_, true);
+  ASSERT_TRUE(is_configure_succeeded(gps_broadcaster_));
 
   setup_gps_broadcaster();
 
-  expect_activate_succeeded(gps_broadcaster_, true);
+  ASSERT_TRUE(is_activate_succeeded(gps_broadcaster_));
 
   const auto gps_msg = subscribe_and_get_message();
   EXPECT_EQ(gps_msg.header.frame_id, frame_id_.get_value<std::string>());
@@ -265,11 +265,11 @@ TEST_F(
     node_options);
   ASSERT_EQ(result, controller_interface::return_type::OK);
 
-  expect_configure_succeeded(gps_broadcaster_, true);
+  ASSERT_TRUE(is_configure_succeeded(gps_broadcaster_));
 
   setup_gps_broadcaster<semantic_components::GPSSensorOption::WithCovariance>();
 
-  expect_activate_succeeded(gps_broadcaster_, true);
+  ASSERT_TRUE(is_activate_succeeded(gps_broadcaster_));
 
   const auto gps_msg = subscribe_and_get_message();
   EXPECT_EQ(gps_msg.header.frame_id, frame_id_.get_value<std::string>());
